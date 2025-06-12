@@ -5,6 +5,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException
+from bs4 import BeautifulSoup
+
 
 import time
 from selenium.webdriver.chrome.options import Options
@@ -29,7 +31,7 @@ class Scraper:
     def accessSite(self):
         self.driver.get("https://uspdigital.usp.br/jupiterweb/jupCarreira.jsp?codmnu=8275")
     
-    def processUnit(self):
+    def navegarJupiter(self):
         self.accessSite()
         # Espera até encontrar o elemento comboUnidade
         self.wait.until(EC.presence_of_element_located((By.ID, "comboUnidade")))
@@ -42,6 +44,7 @@ class Scraper:
         t0 = time.time()
 
         for unidade in unidadeSelect.options[1:]:
+            # criar unidade
             print(unidade.text)
             unidadeSelect.select_by_visible_text(unidade.text) 
             self.wait.until(EC.presence_of_element_located((By.ID, "comboCurso")))
@@ -53,7 +56,7 @@ class Scraper:
                 print("\t", curso.text)
                 cursoSelect.select_by_visible_text(curso.text)
                 buscarButton.click()    
-                self.fetchCurriculum()
+                self.carregarGradeCurricular()
 
         t1 = time.time()
         total = t1 - t0
@@ -61,7 +64,7 @@ class Scraper:
 
         input("Aperte Enter para terminar...")
 
-    def fetchCurriculum(self):
+    def carregarGradeCurricular(self):
         try:
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             self.wait.until(EC.element_to_be_clickable(("id", "step4-tab")))
@@ -71,6 +74,22 @@ class Scraper:
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             abaMenus = self.driver.find_element("id", value="step1-tab")
             abaMenus.click()
+
+            html = self.driver.page_source
+            soup = BeautifulSoup(html, 'html.parser')
+            divGrade = soup.find('div', id="gradeCurricular")
+            tableGrade = divGrade.find('table')
+            trDisciplinas = tableGrade.find_all(
+                    'tr',
+                    attrs={'style': lambda s: s is not None and s.strip() == 'height: 20px;'}
+            )
+            trDisciplinas = divGrade.find('table').select("tr", style=lambda value: value == "height: 20px;")
+
+            for disciplina in trDisciplinas:
+                print(disciplina.prettify())
+            
+                                                         
+
         except ElementClickInterceptedException:
             print("             Erro - dados não encontrados")
 
@@ -83,4 +102,4 @@ class Scraper:
 
 if __name__ == "__main__":
     s = Scraper()
-    s.processUnit()
+    s.navegarJupiter()
