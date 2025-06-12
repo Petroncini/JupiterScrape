@@ -9,7 +9,7 @@ from selenium.common.exceptions import ElementClickInterceptedException, NoSuchE
 import time
 from selenium.webdriver.chrome.options import Options
 
-class Scraping:
+class Scraper:
     def __init__(self):
         options = Options()
         user_agent = (
@@ -26,11 +26,11 @@ class Scraping:
         self.driver = webdriver.Chrome(options=options)
         self.wait = WebDriverWait(self.driver, timeout=2)
     
-    def acessar_site(self):
+    def accessSite(self):
         self.driver.get("https://uspdigital.usp.br/jupiterweb/jupCarreira.jsp?codmnu=8275")
     
-    def navegar_unidade_curso(self):
-        self.acessar_site()
+    def processUnit(self):
+        self.accessSite()
         # Espera até encontrar o elemento comboUnidade
         self.wait.until(EC.presence_of_element_located((By.ID, "comboUnidade")))
         self.wait.until(lambda d: len(Select(d.find_element(By.ID, "comboUnidade")).options) > 1)
@@ -53,7 +53,7 @@ class Scraping:
                 print("\t", curso.text)
                 cursoSelect.select_by_visible_text(curso.text)
                 buscarButton.click()    
-                self.navegar_abas()
+                self.fetchCurriculum()
 
         t1 = time.time()
         total = t1 - t0
@@ -61,7 +61,7 @@ class Scraping:
 
         input("Aperte Enter para terminar...")
 
-    def navegar_abas(self):
+    def fetchCurriculum(self):
         try:
             self.wait.until(EC.element_to_be_clickable(("id", "step4-tab")))
             abaGrade = self.driver.find_element("id", "step4-tab")
@@ -90,5 +90,5 @@ class Scraping:
 
 
 if __name__ == "__main__":
-    s = Scraping()
-    s.navegar_unidade_curso()
+    s = Scraper()
+    s.processUnit()
