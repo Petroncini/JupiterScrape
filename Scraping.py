@@ -24,7 +24,7 @@ class Scraping:
         options.add_argument("--window-size=1920,1080")
 
         self.driver = webdriver.Chrome(options=options)
-        self.wait = WebDriverWait(self.driver, timeout=2)
+        self.wait = WebDriverWait(self.driver, timeout=30)
     
     def acessar_site(self):
         self.driver.get("https://uspdigital.usp.br/jupiterweb/jupCarreira.jsp?codmnu=8275")
@@ -63,28 +63,20 @@ class Scraping:
 
     def navegar_abas(self):
         try:
+            self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             self.wait.until(EC.element_to_be_clickable(("id", "step4-tab")))
             abaGrade = self.driver.find_element("id", "step4-tab")
             abaGrade.click()
 
-            self.wait.until(EC.element_to_be_clickable(("id", "step1-tab")))
+            self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             abaMenus = self.driver.find_element("id", value="step1-tab")
             abaMenus.click()
         except ElementClickInterceptedException:
-            print("Erro - dados não encontrados")
+            print("             Erro - dados não encontrados")
 
             try:
                 fechar = self.driver.find_element(By.XPATH, '//button[contains(@class, "ui-button") and .//span[text()="Fechar"]]')
                 fechar.click()
-
-
-                self.wait.until(EC.element_to_be_clickable(("id", "step4-tab")))
-                abaGrade = self.driver.find_element("id", "step4-tab")
-                abaGrade.click()
-
-                self.wait.until(EC.element_to_be_clickable(("id", "step1-tab")))
-                abaMenus = self.driver.find_element("id", value="step1-tab")
-                abaMenus.click()
             except NoSuchElementException:
                 print("Fatal")
 
