@@ -79,14 +79,10 @@ class Scraper:
             soup = BeautifulSoup(html, 'html.parser')
             divGrade = soup.find('div', id="gradeCurricular")
             tableGrade = divGrade.find('table')
-            trDisciplinas = tableGrade.find_all(
-                    'tr',
-                    attrs={'style': lambda s: s is not None and s.strip() == 'height: 20px;'}
-            )
-            trDisciplinas = divGrade.find('table').select("tr", style=lambda value: value == "height: 20px;")
-
-            for disciplina in trDisciplinas:
-                print(disciplina.prettify())
+            for tr in tableGrade.find_all('tr'):
+                style = tr.get('style')
+                if style is not None and style.strip() == 'height: 20px;':
+                    print(tr.prettify())
             
                                                          
 
