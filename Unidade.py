@@ -1,3 +1,5 @@
 class Unidade:
-    def __init__(self):
-        cursos = []
+    def __init__(self, nome):
+        self.nome = nome
+        self.cursos = []
+    

@@ -9,13 +9,6 @@ class Curso:
         self.livres = []
         self.eletivas = []
     
-    def adicionar_disciplina (self, tipo, disciplina):
-        if (tipo == "obrigatoria"):
-            self.obrigatoria.append(disciplina)
-        if (tipo == "livre"):
-            self.livres.append(disciplina)
-        if (tipo == "eletiva"):
-            self.eletivas.append(disciplina)
-              
+
 
 

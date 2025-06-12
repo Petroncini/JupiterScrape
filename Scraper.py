@@ -11,6 +11,11 @@ from bs4 import BeautifulSoup
 import time
 from selenium.webdriver.chrome.options import Options
 
+from USP import USP
+from Unidade import Unidade
+from Curso import Curso 
+from Disciplina import Disciplina
+
 class Scraper:
     def __init__(self):
         options = Options()
@@ -28,11 +33,11 @@ class Scraper:
         self.driver = webdriver.Chrome(options=options)
         self.wait = WebDriverWait(self.driver, timeout=30)
     
-    def accessSite(self):
+    def acessarSite(self):
         self.driver.get("https://uspdigital.usp.br/jupiterweb/jupCarreira.jsp?codmnu=8275")
     
-    def navegarJupiter(self):
-        self.accessSite()
+    def navegarJupiter(self, usp):
+        self.acessarSite()
         # Espera até encontrar o elemento comboUnidade
         self.wait.until(EC.presence_of_element_located((By.ID, "comboUnidade")))
         self.wait.until(lambda d: len(Select(d.find_element(By.ID, "comboUnidade")).options) > 1)
@@ -44,7 +49,9 @@ class Scraper:
         t0 = time.time()
 
         for unidade in unidadeSelect.options[1:]:
-            # criar unidade
+            # Cria unidade e adiciona na USP 
+            uni = Unidade(unidade)
+            usp.adicionaUnidade(uni)
             print(unidade.text)
             unidadeSelect.select_by_visible_text(unidade.text) 
             self.wait.until(EC.presence_of_element_located((By.ID, "comboCurso")))
@@ -75,17 +82,8 @@ class Scraper:
             abaMenus = self.driver.find_element("id", value="step1-tab")
             abaMenus.click()
 
-            html = self.driver.page_source
-            soup = BeautifulSoup(html, 'html.parser')
-            divGrade = soup.find('div', id="gradeCurricular")
-            tableGrade = divGrade.find('table')
-            for tr in tableGrade.find_all('tr'):
-                style = tr.get('style')
-                if style is not None and style.strip() == 'height: 20px;':
-                    print(tr.prettify())
+            self.getCurso()
             
-                                                         
-
         except ElementClickInterceptedException:
             print("             Erro - dados não encontrados")
 
@@ -94,8 +92,26 @@ class Scraper:
                 fechar.click()
             except NoSuchElementException:
                 print("Fatal")
+    
+    def getCurso(self):
+        html = self.driver.page_source
+        soup = BeautifulSoup(html, 'html.parser')
+        divInformacoes = soup.find('div', id='step4')
+        #print(divInformacoes.prettify())
+        # Informações do curso 
+        unidade = divInformacoes.find('span', class_='unidade')
+        curso = divInformacoes.find('span', class_='curso')
+        ideal = divInformacoes.find('span', class_='duridlhab')
+        minima = divInformacoes.find('span', class_='durminhab')
+        maxima = divInformacoes.find('span', class_='durmaxhab')
+        # Cria o curso
+        curso = Curso(curso, unidade, ideal, minima, maxima)
 
+        divGrade = soup.find('div', id="gradeCurricular")
 
-if __name__ == "__main__":
-    s = Scraper()
-    s.navegarJupiter()
+        tableGrade = divGrade.find('table')
+        for tr in tableGrade.find_all('tr'):
+            style = tr.get('style')
+            if style is not None and style.strip() == 'height: 20px;':
+                
+                print(tr.prettify())
