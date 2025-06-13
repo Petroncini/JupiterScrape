@@ -14,6 +14,7 @@ class Main:
         s.acessarSite()
         s.navegarJupiter()
 
+
     if __name__ == "__main__":
         main()
                                                                                                                                               

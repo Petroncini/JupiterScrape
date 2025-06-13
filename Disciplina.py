@@ -9,6 +9,12 @@ class Disciplina:
         self.CP = CP
         self.ATPA = ATPA
         self.tipo = tipo
+        self.cursosComuns = []
+
+
+    def incluirCurso(self, curso):
+        self.cursosComuns.append((curso.unidade, curso.nome))
+
 
     def __str__(self):
         print(f"\t\t{self.cod} - {self.nome}")
@@ -22,3 +28,12 @@ class Disciplina:
         if self.ATPA:
             print(f"\tAtividades Teórico-Práticas de Aprofundamento: {self.ATPA}")
         print()
+    
+
+    def cursosAssociados(self):
+        self.cursosComuns.sort()
+        string = "Cursos associados:\n\n"
+        for (unidade, curso) in self.cursosComuns:
+            string += (f"{curso} - {unidade}\n")
+
+        return string

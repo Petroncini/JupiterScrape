@@ -54,12 +54,12 @@ class Scraper:
         t0 = time.time()
 
         if self.limite is None : self.limite = len(unidadeSelect.options)
-        
+
         for unidade in unidadeSelect.options[1:self.limite]:
             # Cria unidade e adiciona na USP 
             self.unidadeAtual = Unidade(unidade)
 
-            self.usp.adicionaUnidade(self.unidadeAtual)
+            self.usp.adicionarUnidade(self.unidadeAtual)
 
             unidadeSelect.select_by_visible_text(unidade.text) 
             self.wait.until(EC.presence_of_element_located((By.ID, "comboCurso")))
@@ -122,6 +122,7 @@ class Scraper:
         for tableGrade in divGrade.find_all('table'):
             tipoDisciplinas = "Obrigatória"
             for tr in tableGrade.find_all('tr'):
+                # processarDisciplina(tr)?
                 style = tr.get('style')
 
                 if style is not None and style.strip() == "background-color: rgb(16, 148, 171); color: white;":
@@ -136,26 +137,28 @@ class Scraper:
 
                     linkDisciplina = tds[0].find('a')
                     disciplinaCodigo = linkDisciplina.contents[0] if tds[0].contents else None
-                    disciplinaNome = tds[1].contents[0] if tds[1].contents else None
-                    credAula = tds[2].contents[0] if tds[2].contents else None
-                    credTrab = tds[3].contents[0] if tds[3].contents else None
-                    CH = tds[4].contents[0] if tds[4].contents else None
-                    CE = tds[5].contents[0] if tds[5].contents else None
-                    CP = tds[6].contents[0] if tds[6].contents else None
-                    ATPA = tds[7].contents[0] if tds[7].contents else None
 
+                    disciplina = self.usp.buscarDisciplina(disciplinaCodigo)
 
-                    disciplina = Disciplina(
-                        disciplinaCodigo, 
-                        disciplinaNome,
-                        credAula,
-                        credTrab,
-                        CH, CE, CP, ATPA,
-                        tipoDisciplinas)
+                    if disciplina is None:
+                        disciplinaNome = tds[1].contents[0] if tds[1].contents else None
+                        credAula = tds[2].contents[0] if tds[2].contents else None
+                        credTrab = tds[3].contents[0] if tds[3].contents else None
+                        CH = tds[4].contents[0] if tds[4].contents else None
+                        CE = tds[5].contents[0] if tds[5].contents else None
+                        CP = tds[6].contents[0] if tds[6].contents else None
+                        ATPA = tds[7].contents[0] if tds[7].contents else None
 
-                    self.usp.adicionaDisciplina(disciplina)
+                        disciplina = Disciplina(
+                            disciplinaCodigo, 
+                            disciplinaNome,
+                            credAula,
+                            credTrab,
+                            CH, CE, CP, ATPA,
+                            tipoDisciplinas)
+
+                    disciplina.incluirCurso(self.cursoAtual)
+                    self.usp.adicionarDisciplina(disciplina)
                     self.cursoAtual.adicionarDisciplina(disciplina)
+
         self.unidadeAtual.adicionarCurso(self.cursoAtual)   
-
-
-

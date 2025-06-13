@@ -22,21 +22,23 @@ class Curso:
     
 
     def __str__(self):
-        print(f"Unidade: {self.unidade}")
-        print(f"Curso: {self.nome}")
-        print("Duração")
-        print(f"\tIdeal: {self.ideal}\tMínima: {self.min}\tMáxima: {self.max}")
+        string = ""
+        string += (f"Unidade: {self.unidade}\n")
+        string += (f"Curso: {self.nome}\n")
+        string += ("Duração\n")
+        string += (f"\tIdeal: {self.ideal}\tMínima: {self.min}\tMáxima: {self.max}\n")
 
-        print("\nDisciplinas Obrigatórias\n")
+        string += ("\nDisciplinas Obrigatórias\n")
         for disciplina in self.obrigatorias:
-            print(f"\t{disciplina.cod} - {disciplina.nome}")
+            string += (f"\t{disciplina.cod} - {disciplina.nome}\n")
 
         if self.eletivas:
-            print("\nDisciplinas Optativas Eletivas\n")
+            string += ("\nDisciplinas Optativas Eletivas\n")
             for disciplina in self.eletivas:
-                print(f"\t{disciplina.cod} - {disciplina.nome}")
+                string += (f"\t{disciplina.cod} - {disciplina.nome}\n")
 
         if self.livres: 
-            print("\nDisciplinas Optativas Livres\n")
+            string += ("\nDisciplinas Optativas Livres\n")
             for disciplina in self.obrigatorias:
-                print(f"\t{disciplina.cod} - {disciplina.nome}")
+                string += (f"\t{disciplina.cod} - {disciplina.nome}\n")
+        return string
