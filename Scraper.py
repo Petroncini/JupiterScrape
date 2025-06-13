@@ -17,7 +17,7 @@ from Curso import Curso
 from Disciplina import Disciplina
 
 class Scraper:
-    def __init__(self):
+    def __init__(self, usp: USP):
         options = Options()
         user_agent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -29,6 +29,10 @@ class Scraper:
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--window-size=1920,1080")
+        self.usp = usp
+        self.unidadeAtual = None
+        self.cursoAtual = None
+
 
         self.driver = webdriver.Chrome(options=options)
         self.wait = WebDriverWait(self.driver, timeout=30)
@@ -36,7 +40,7 @@ class Scraper:
     def acessarSite(self):
         self.driver.get("https://uspdigital.usp.br/jupiterweb/jupCarreira.jsp?codmnu=8275")
     
-    def navegarJupiter(self, usp):
+    def navegarJupiter(self):
         self.acessarSite()
         # Espera até encontrar o elemento comboUnidade
         self.wait.until(EC.presence_of_element_located((By.ID, "comboUnidade")))
@@ -50,9 +54,10 @@ class Scraper:
 
         for unidade in unidadeSelect.options[1:]:
             # Cria unidade e adiciona na USP 
-            uni = Unidade(unidade)
-            usp.adicionaUnidade(uni)
-            print(unidade.text)
+            self.unidadeAtual = Unidade(unidade)
+
+            self.usp.adicionaUnidade(self.unidadeAtual)
+
             unidadeSelect.select_by_visible_text(unidade.text) 
             self.wait.until(EC.presence_of_element_located((By.ID, "comboCurso")))
             self.wait.until(lambda _: len(Select(self.driver.find_element("id", value="comboCurso")).options) > 1)
@@ -65,11 +70,12 @@ class Scraper:
                 buscarButton.click()    
                 self.carregarGradeCurricular()
 
+        self.unidadeAtual = None
+        self.cursoAtual = None
+
         t1 = time.time()
         total = t1 - t0
         print(f'Time: {total}')
-
-        input("Aperte Enter para terminar...")
 
     def carregarGradeCurricular(self):
         try:
@@ -96,22 +102,57 @@ class Scraper:
     def getCurso(self):
         html = self.driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
-        divInformacoes = soup.find('div', id='step4')
+        divInformacoes = soup.find('div', id='step4') 
+        assert divInformacoes is not None
         #print(divInformacoes.prettify())
         # Informações do curso 
-        unidade = divInformacoes.find('span', class_='unidade')
-        curso = divInformacoes.find('span', class_='curso')
-        ideal = divInformacoes.find('span', class_='duridlhab')
-        minima = divInformacoes.find('span', class_='durminhab')
-        maxima = divInformacoes.find('span', class_='durmaxhab')
+        unidadeNome = divInformacoes.find('span', class_='unidade').contents[0]
+        cursoNome = divInformacoes.find('span', class_='curso').contents[0]
+        ideal = divInformacoes.find('span', class_='duridlhab').contents[0]
+        minima = divInformacoes.find('span', class_='durminhab').contents[0]
+        maxima = divInformacoes.find('span', class_='durmaxhab').contents[0]
         # Cria o curso
-        curso = Curso(curso, unidade, ideal, minima, maxima)
+        self.cursoAtual = Curso(cursoNome, unidadeNome, ideal, minima, maxima)
 
         divGrade = soup.find('div', id="gradeCurricular")
 
-        tableGrade = divGrade.find('table')
-        for tr in tableGrade.find_all('tr'):
-            style = tr.get('style')
-            if style is not None and style.strip() == 'height: 20px;':
-                
-                print(tr.prettify())
+        for tableGrade in divGrade.find_all('table'):
+            tipoDisciplinas = "Obrigatória"
+            for tr in tableGrade.find_all('tr'):
+                style = tr.get('style')
+
+                if style is not None and style.strip() == "background-color: rgb(16, 148, 171); color: white;":
+                    if "Livres" in tr.td.contents[0]:
+                        tipoDisciplinas = "Livre"
+                    elif "Eletivas" in tr.td.contents[0]:
+                        tipoDisciplinas = "Eletiva"
+                    continue
+
+                if style is not None and style.strip() == 'height: 20px;':
+                    tds = tr.find_all('td')
+
+                    linkDisciplina = tds[0].find('a')
+                    disciplinaCodigo = linkDisciplina.contents[0] if tds[0].contents else None
+                    disciplinaNome = tds[1].contents[0] if tds[1].contents else None
+                    credAula = tds[2].contents[0] if tds[2].contents else None
+                    credTrab = tds[3].contents[0] if tds[3].contents else None
+                    CH = tds[4].contents[0] if tds[4].contents else None
+                    CE = tds[5].contents[0] if tds[5].contents else None
+                    CP = tds[6].contents[0] if tds[6].contents else None
+                    ATPA = tds[7].contents[0] if tds[7].contents else None
+
+
+                    disciplina = Disciplina(
+                        disciplinaCodigo, 
+                        disciplinaNome,
+                        credAula,
+                        credTrab,
+                        CH, CE, CP, ATPA,
+                        tipoDisciplinas)
+
+                    self.usp.adicionaDisciplina(disciplina)
+                    self.cursoAtual.adicionarDisciplina(disciplina)
+        self.unidadeAtual.adicionarCurso(self.cursoAtual)   
+
+
+

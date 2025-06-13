@@ -1,5 +1,5 @@
 class Disciplina:
-    def __init__(self, cod, nome, aula, trabalho, CH, CE, CP, ATPA):
+    def __init__(self, cod, nome, aula, trabalho, CH, CE, CP, ATPA, tipo):
         self.cod = cod
         self.nome = nome
         self.aula = aula
@@ -8,6 +8,7 @@ class Disciplina:
         self.CE = CE
         self.CP = CP
         self.ATPA = ATPA
+        self.tipo = tipo
 
     def imprimir(self):
         print(f"Disciplina: {self.cod} - {self.nome}")
