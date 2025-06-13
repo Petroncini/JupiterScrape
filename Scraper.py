@@ -24,7 +24,7 @@ class Scraper:
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
         )
         options.add_argument(f"user-agent={user_agent}")
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
@@ -54,7 +54,8 @@ class Scraper:
 
         for unidade in unidadeSelect.options[1:]:
             # Cria unidade e adiciona na USP 
-            self.unidadeAtual = Unidade(unidade)
+            self.unidadeAtual = Unidade(unidade.text)
+            print(self.unidadeAtual.nome)
 
             self.usp.adicionaUnidade(self.unidadeAtual)
 
@@ -65,7 +66,6 @@ class Scraper:
             cursoSelect = Select(cursoSelect_element)
 
             for curso in cursoSelect.options[1:]:
-                print("\t", curso.text)
                 cursoSelect.select_by_visible_text(curso.text)
                 buscarButton.click()    
                 self.carregarGradeCurricular()
@@ -85,10 +85,12 @@ class Scraper:
             abaGrade.click()
 
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
+            self.getCurso()
+
+            self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             abaMenus = self.driver.find_element("id", value="step1-tab")
             abaMenus.click()
 
-            self.getCurso()
             
         except ElementClickInterceptedException:
             print("             Erro - dados não encontrados")
@@ -96,6 +98,11 @@ class Scraper:
             try:
                 fechar = self.driver.find_element(By.XPATH, '//button[contains(@class, "ui-button") and .//span[text()="Fechar"]]')
                 fechar.click()
+
+                self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
+                abaMenus = self.driver.find_element("id", value="step1-tab")
+                abaMenus.click()
+
             except NoSuchElementException:
                 print("Fatal")
     
@@ -113,8 +120,13 @@ class Scraper:
         maxima = divInformacoes.find('span', class_='durmaxhab').contents[0]
         # Cria o curso
         self.cursoAtual = Curso(cursoNome, unidadeNome, ideal, minima, maxima)
+        print(f"\t{self.cursoAtual.nome}")
+
 
         divGrade = soup.find('div', id="gradeCurricular")
+        if self.cursoAtual.nome == "Engenharia Florestal - integral":
+            print(divInformacoes.prettify())
+        #     print(divGrade.prettify())
 
         for tableGrade in divGrade.find_all('table'):
             tipoDisciplinas = "Obrigatória"
@@ -149,11 +161,22 @@ class Scraper:
                         credTrab,
                         CH, CE, CP, ATPA,
                         tipoDisciplinas)
-
+                    
                     self.usp.adicionaDisciplina(disciplina)
                     self.cursoAtual.adicionarDisciplina(disciplina)
-        self.unidadeAtual.adicionarCurso(self.cursoAtual)   
-        print(self.cursoAtual)
+        self.unidadeAtual.adicionarCurso(self.cursoAtual)  
+
+        if len(self.cursoAtual.obrigatorias) == 0:
+            print("\t\tCurso sem obrigatórias")
+        if len(self.cursoAtual.eletivas) == 0:
+            print("\t\tCurso sem eletivas")
+        if len(self.cursoAtual.livres) == 0:
+            print("\t\tCurso sem livres")
+
+        if self.cursoAtual.nome == "Engenharia Florestal - integral":
+            print(self.cursoAtual)
+
+                # print(self.cursoAtual)
 
 
 
