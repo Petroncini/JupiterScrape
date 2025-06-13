@@ -6,7 +6,7 @@ class Unidade:
         self.nome = nome
         self.cursos = []
 
-    def imprimirCursos(self):
+    def listarCursos(self):
         for curso in self.cursos:
             print(curso.nome)
             

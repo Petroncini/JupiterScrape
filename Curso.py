@@ -13,7 +13,7 @@ class Curso:
         self.eletivas = []
 
     def adicionarDisciplina(self, disciplina: Disciplina):
-        if disciplina.tipo == "obrigatoria":
+        if disciplina.tipo == "Obrigatória":
             self.obrigatorias.append(disciplina)
         elif disciplina.tipo == "Livre":
             self.livres.append(disciplina)
@@ -29,17 +29,14 @@ class Curso:
 
         print("\nDisciplinas Obrigatórias\n")
         for disciplina in self.obrigatorias:
-            disciplina.imprimir()
-            print()
+            print(f"\t{disciplina.cod} - {disciplina.nome}")
 
         if self.eletivas:
             print("\nDisciplinas Optativas Eletivas\n")
             for disciplina in self.eletivas:
-                disciplina.imprimir()
-                print()
+                print(f"\t{disciplina.cod} - {disciplina.nome}")
 
         if self.livres: 
             print("\nDisciplinas Optativas Livres\n")
             for disciplina in self.obrigatorias:
-                disciplina.imprimir()
-                print()
+                print(f"\t{disciplina.cod} - {disciplina.nome}")

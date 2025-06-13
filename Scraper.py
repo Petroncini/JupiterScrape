@@ -17,7 +17,7 @@ from Curso import Curso
 from Disciplina import Disciplina
 
 class Scraper:
-    def __init__(self, usp: USP):
+    def __init__(self, usp: USP, nroUnidades=None):
         options = Options()
         user_agent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -32,6 +32,7 @@ class Scraper:
         self.usp = usp
         self.unidadeAtual = None
         self.cursoAtual = None
+        self.limite = (nroUnidades + 1) if nroUnidades is not None else None
 
 
         self.driver = webdriver.Chrome(options=options)
@@ -52,7 +53,9 @@ class Scraper:
         unidadeSelect = Select(unidadeSelect_element)
         t0 = time.time()
 
-        for unidade in unidadeSelect.options[1:]:
+        if self.limite is None : self.limite = len(unidadeSelect.options)
+        
+        for unidade in unidadeSelect.options[1:self.limite]:
             # Cria unidade e adiciona na USP 
             self.unidadeAtual = Unidade(unidade)
 
