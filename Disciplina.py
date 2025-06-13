@@ -17,23 +17,25 @@ class Disciplina:
 
 
     def __str__(self):
-        print(f"\t\t{self.cod} - {self.nome}")
-        print(f"\tCréditos Aula: {self.aula}")
-        print(f"\tCréditos Trabalho: {self.trabalho}")
-        print(f"\tCarga Horária Total: {self.CH} h")
+        s = ""
+        s += f"\t{self.cod} - {self.nome}\n"
+        s += f"\tCréditos Aula: {self.aula}\n"
+        s += f"\tCréditos Trabalho: {self.trabalho}\n"
+        s += f"\tCarga Horária Total: {self.CH} h\n"
         if self.CE:
-            print(f"\tCarga Horária de Estágio: {self.CH} h")
+            s += f"\tCarga Horária de Estágio: {self.CH} h\n"
         if self.CP:
-            print(f"\tCarga Horária de Práticas como Componentes Curriculares: {self.CP} h")
+            s += f"\tCarga Horária de Práticas como Componentes Curriculares: {self.CP} h\n"
         if self.ATPA:
-            print(f"\tAtividades Teórico-Práticas de Aprofundamento: {self.ATPA}")
-        print()
-    
+            s += f"\tAtividades Teórico-Práticas de Aprofundamento: {self.ATPA}\n"
+        s += "\n"
 
+        return s
+    
     def cursosAssociados(self):
         self.cursosComuns.sort()
-        string = "Cursos associados:\n\n"
+        s = "Cursos associados:\n\n"
         for (unidade, curso) in self.cursosComuns:
-            string += (f"{curso} - {unidade}\n")
-
-        return string
+            s += f"{curso} - {unidade}\n"
+        
+        return s
