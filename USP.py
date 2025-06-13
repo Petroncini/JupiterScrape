@@ -11,13 +11,23 @@ class USP:
         self.unidades.append(unidade)
 
     # Imprime o nome dos cursos da unidade especificada
-    def cursosPorUnidade(self, nomeUnidade):
+    def listarCursosPorUnidade(self, nomeUnidade):
         unidade = next((u for u in self.unidades if u.nome == nomeUnidade), None)
         if unidade is not None:
-            unidade.imprimirCursos()
+            unidade.listarCursos()
 
-    def buscarCurso(self, nomeCurso):
-        for unidade in self.unidades:
-            curso = next((c for c in unidade.cursos if c.nome == nomeCurso), None)
-        if curso is not None:
-            curso.imprimirCurso()
+    # Imprime os dados de um curso ou de todos
+    def mostrarCursos(self, nomeCurso=None):
+        if nomeCurso is None:
+            for unidade in self.unidades:
+                for curso in unidade.cursos:
+                    print(curso)
+        else:
+            for unidade in self.unidades:
+                curso = next((c for c in unidade.cursos if c.nome == nomeCurso), None)
+                if curso:
+                    print(curso)
+                    return
+                
+    # def mostrarDisciplina(self, nome=None, codigo=None):
+
