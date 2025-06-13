@@ -21,22 +21,25 @@ class Curso:
             self.eletivas.append(disciplina)
     
 
-    def imprimirCurso(self):
+    def __str__(self):
         print(f"Unidade: {self.unidade}")
         print(f"Curso: {self.nome}")
         print("Duração")
-        print(f"Ideal: {self.ideal}\tMínima: {self.min}\tMáxima: {self.max}")
+        print(f"\tIdeal: {self.ideal}\tMínima: {self.min}\tMáxima: {self.max}")
 
         print("\nDisciplinas Obrigatórias\n")
         for disciplina in self.obrigatorias:
             disciplina.imprimir()
+            print()
 
         if self.eletivas:
             print("\nDisciplinas Optativas Eletivas\n")
             for disciplina in self.eletivas:
                 disciplina.imprimir()
+                print()
 
         if self.livres: 
             print("\nDisciplinas Optativas Livres\n")
             for disciplina in self.obrigatorias:
                 disciplina.imprimir()
+                print()
