@@ -21,7 +21,7 @@ class Curso:
             self.eletivas.append(disciplina)
     
 
-    def imprimirCurso(self):
+    def __str__(self):
         print(f"Unidade: {self.unidade}")
         print(f"Curso: {self.nome}")
         print("Duração")

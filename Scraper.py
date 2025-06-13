@@ -153,6 +153,7 @@ class Scraper:
                     self.usp.adicionaDisciplina(disciplina)
                     self.cursoAtual.adicionarDisciplina(disciplina)
         self.unidadeAtual.adicionarCurso(self.cursoAtual)   
+        print(self.cursoAtual)
 
 
 
