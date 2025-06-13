@@ -8,9 +8,9 @@ class Main:
 
     def main():
         usp = USP()
-        s = Scraper()
+        s = Scraper(usp)
         s.acessarSite()
-        s.navegarJupiter(usp)
+        s.navegarJupiter()
 
     if __name__ == "__main__":
         main()

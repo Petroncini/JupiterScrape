@@ -4,7 +4,7 @@ class USP:
         self._disciplinas = set()
 
     def adicionaDisciplina(self, disciplina):
-        if disciplina not in self.disciplinas:
+        if disciplina not in self._disciplinas:
             self._disciplinas.add(disciplina)
         
     def adicionaUnidade(self, unidade):
