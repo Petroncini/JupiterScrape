@@ -1,6 +1,5 @@
 from Curso import Curso
 
-
 class Unidade:
     def __init__(self, nome):
         self.nome = nome
