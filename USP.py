@@ -32,6 +32,7 @@ class USP:
             for unidade in self.unidades:
                 for curso in unidade.cursos:
                     print(curso)
+                    
         else:
             for unidade in self.unidades:
                 curso = next((c for c in unidade.cursos if c.nome == nomeCurso), None)
@@ -46,6 +47,7 @@ class USP:
             if disciplina:
                 print(disciplina)
                 print(disciplina.cursosAssociados())
+                print("**********")
             else:
                 print("Disciplina não encontrada")
         elif nome:
@@ -54,6 +56,7 @@ class USP:
                 for d in disciplinas:
                     print(d)
                     print(d.cursosAssociados())
+                    print("**********")
             else:
                 print("Disciplina não encontrada")
         
@@ -67,3 +70,12 @@ class USP:
         if codigos:
             return [self._disciplinasPorCod[cod] for cod in codigos]
         return None
+
+    def disciplinasCursos(self):
+        for codigo, disciplina in self._disciplinasPorCod.items():
+            if disciplina.cursosComuns and len(disciplina.cursosComuns) > 1:
+                print(disciplina)
+                print(disciplina.cursosAssociados())
+                print("**********")
+            
+

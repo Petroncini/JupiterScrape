@@ -24,7 +24,7 @@ class Scraper:
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
         )
         options.add_argument(f"user-agent={user_agent}")
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
@@ -127,9 +127,11 @@ class Scraper:
 
 
         divGrade = soup.find('div', id="gradeCurricular")
-        if self.cursoAtual.nome == "Engenharia Florestal - integral":
-            print(divInformacoes.prettify())
-        #     print(divGrade.prettify())
+
+
+        # if self.cursoAtual.nome == "Engenharia Florestal - integral":
+        #     print(divInformacoes.prettify())
+        # #     print(divGrade.prettify())
 
         for tableGrade in divGrade.find_all('table'):
             tipoDisciplinas = "Obrigatória"
@@ -137,6 +139,7 @@ class Scraper:
                 # processarDisciplina(tr)?
                 style = tr.get('style')
 
+                # Verifica qual tipo de disciplina é
                 if style is not None and style.strip() == "background-color: rgb(16, 148, 171); color: white;":
                     if "Livres" in tr.td.contents[0]:
                         tipoDisciplinas = "Livre"
@@ -150,6 +153,7 @@ class Scraper:
                     linkDisciplina = tds[0].find('a')
                     disciplinaCodigo = linkDisciplina.contents[0] if tds[0].contents else None
 
+                    # Verifica se a disciplina já está na lista de disciplinas em usp 
                     disciplina = self.usp.buscarDisciplina(disciplinaCodigo)
 
                     if disciplina is None:
@@ -166,12 +170,14 @@ class Scraper:
                             disciplinaNome,
                             credAula,
                             credTrab,
-                            CH, CE, CP, ATPA,
-                            tipoDisciplinas)
-
+                            CH, CE, CP, ATPA)
+                    
+                    # Quais cursos tem essa disciplina
                     disciplina.incluirCurso(self.cursoAtual)
+                    # Adiciona a disciplina na lista de disciplinas da usp
                     self.usp.adicionarDisciplina(disciplina)
-                    self.cursoAtual.adicionarDisciplina(disciplina)
+                    # O curso atual recebe a disciplina
+                    self.cursoAtual.adicionarDisciplina(disciplina, tipoDisciplinas)
 
         self.unidadeAtual.adicionarCurso(self.cursoAtual)   
 
@@ -182,7 +188,7 @@ class Scraper:
         if len(self.cursoAtual.livres) == 0:
             print("\t\tCurso sem livres")
 
-        if self.cursoAtual.nome == "Engenharia Florestal - integral":
-            print(self.cursoAtual)
+        # if self.cursoAtual.nome == "Engenharia Florestal - integral":
+        #     print(self.cursoAtual)
 
                 # print(self.cursoAtual)

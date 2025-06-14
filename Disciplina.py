@@ -1,5 +1,5 @@
 class Disciplina:
-    def __init__(self, cod, nome, aula, trabalho, CH, CE, CP, ATPA, tipo):
+    def __init__(self, cod, nome, aula, trabalho, CH, CE, CP, ATPA):
         self.cod = cod
         self.nome = nome
         self.aula = aula
@@ -8,7 +8,6 @@ class Disciplina:
         self.CE = CE
         self.CP = CP
         self.ATPA = ATPA
-        self.tipo = tipo
         self.cursosComuns = []
 
 
@@ -18,7 +17,7 @@ class Disciplina:
 
     def __str__(self):
         s = ""
-        s += f"\t{self.cod} - {self.nome}\n"
+        s += f"{self.cod} - {self.nome}\n"
         s += f"\tCréditos Aula: {self.aula}\n"
         s += f"\tCréditos Trabalho: {self.trabalho}\n"
         s += f"\tCarga Horária Total: {self.CH} h\n"
@@ -34,8 +33,8 @@ class Disciplina:
     
     def cursosAssociados(self):
         self.cursosComuns.sort()
-        s = "Cursos associados:\n\n"
+        s = "Cursos associados:\n"
         for (unidade, curso) in self.cursosComuns:
-            s += f"{curso} - {unidade}\n"
+            s += f"\t{curso} - {unidade}\n\n"
         
         return s

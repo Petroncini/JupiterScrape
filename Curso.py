@@ -12,10 +12,10 @@ class Curso:
         self.livres = []
         self.eletivas = []
 
-    def adicionarDisciplina(self, disciplina: Disciplina):
-        if disciplina.tipo == "Obrigatória":
+    def adicionarDisciplina(self, disciplina: Disciplina, tipo):
+        if tipo == "Obrigatória":
             self.obrigatorias.append(disciplina)
-        elif disciplina.tipo == "Livre":
+        elif tipo == "Livre":
             self.livres.append(disciplina)
         else:
             self.eletivas.append(disciplina)
