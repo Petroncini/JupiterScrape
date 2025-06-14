@@ -33,6 +33,7 @@ class Scraper:
         self.unidadeAtual = None
         self.cursoAtual = None
         self.limite = (nroUnidades + 1) if nroUnidades is not None else None
+        self.prevGrade = None
 
 
         self.driver = webdriver.Chrome(options=options)
@@ -70,6 +71,8 @@ class Scraper:
 
             for curso in cursoSelect.options[1:]:
                 cursoSelect.select_by_visible_text(curso.text)
+                self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
+                self.wait.until(EC.element_to_be_clickable(("id", "enviar")))
                 buscarButton.click()    
                 self.carregarGradeCurricular()
 
@@ -86,6 +89,11 @@ class Scraper:
             self.wait.until(EC.element_to_be_clickable(("id", "step4-tab")))
             abaGrade = self.driver.find_element("id", "step4-tab")
             abaGrade.click()
+
+            self.wait.until(
+            lambda d: d.find_element(By.CSS_SELECTOR, "#step4 .curso").text != 
+            (self.cursoAtual.nome if self.cursoAtual else "")
+            )
 
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             self.getCurso()
@@ -127,8 +135,9 @@ class Scraper:
 
 
         divGrade = soup.find('div', id="gradeCurricular")
-        if self.cursoAtual.nome == "Engenharia Florestal - integral":
+        if divGrade == self.prevGrade:
             print(divInformacoes.prettify())
+            self.prevGrade = divGrade
         #     print(divGrade.prettify())
 
         for tableGrade in divGrade.find_all('table'):
@@ -176,7 +185,7 @@ class Scraper:
         if len(self.cursoAtual.livres) == 0:
             print("\t\tCurso sem livres")
 
-        if self.cursoAtual.nome == "Engenharia Florestal - integral":
+        if self.cursoAtual.nome == "Turismo - noturno":
             print(self.cursoAtual)
 
                 # print(self.cursoAtual)
