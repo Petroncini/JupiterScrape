@@ -24,11 +24,14 @@ class Main:
                 case 1: # Lista de cursos por unidades
                     unidade = input()
                     usp.listarCursosPorUnidade(unidade)
+
                 case 2: # Dados de um determinado curso
                     curso = input()
                     usp.mostrarCursos(curso)
+
                 case 3: # Dados de todos os cursos 
                     usp.mostrarCursos()
+
                 case 4: # Dados de uma disciplina
                     disciplina = input()
                     # Se for código
@@ -37,10 +40,13 @@ class Main:
                     # Se for nome
                     else:
                         usp.mostrarDisciplina(disciplina, None)
+
                 case 5: # Disciplinas que são usadas em mais de um curso
                     usp.disciplinasCursos()
+
                 case -1:
                     break
+                
                 case _:
                     print("\nCódigo Inválido!\n")
 
