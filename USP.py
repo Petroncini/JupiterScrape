@@ -1,10 +1,12 @@
+from Disciplina import Disciplina
+
 class USP:
     def __init__(self):
         self.unidades = []
         self._disciplinasPorCod = {}
         self._codigosPorNome = {}
 
-    def adicionarDisciplina(self, disciplina):
+    def adicionarDisciplina(self, disciplina: Disciplina):
         codigo = disciplina.cod
         nome = disciplina.nome
 
@@ -34,8 +36,10 @@ class USP:
 
     # Imprime os dados de um curso ou de todos
     def mostrarCursos(self, nomeCurso=None):
+        cursoEncontrado = False
         # Imprime os dados de todos os cursos
         if nomeCurso is None:
+            cursoEncontrado = True
             for unidade in self.unidades:
                 for curso in unidade.cursos:
                     print()
@@ -45,11 +49,12 @@ class USP:
             for unidade in self.unidades:
                 cursos = [c for c in unidade.cursos if nomeCurso in c.nome]
                 if cursos:
+                    cursoEncontrado = True
                     print(f"Foram encontrados {len(cursos)} cursos:\n" if len(cursos) > 1 else "")
                     for curso in cursos:
                         print(curso)
-                else:
-                    print("Curso não encontrado")
+        if not cursoEncontrado:
+            print("Curso não encontrado")
                 
 
     # Imprime os resultados da busca por uma disciplina via nome ou código

@@ -4,6 +4,8 @@ from Unidade import Unidade
 from Curso import Curso 
 from Disciplina import Disciplina
 import sys
+import os.path
+import dill as pickle
 
 class Main:
 
@@ -21,14 +23,30 @@ class Main:
         return s
     
     #@staticmethod
+
+
+   
+       
     def main():
         nroUnidades = int(sys.argv[1]) if len(sys.argv) > 1 else None
         print("\n***------------- Aguarde o carregamento das unidades -------------***\n")
 
-        usp = USP()
-        s = Scraper(usp, nroUnidades)
-        s.acessarSite()
-        s.navegarJupiter()
+        carregarUsp = None
+        if os.path.os.path.isfile("usp.pkl"):
+            carregarUsp = input("Deseja carregar os dados salvos? (y/n) ").strip().lower()
+
+        if carregarUsp is not None and carregarUsp in {"y", "yes"}:
+            with open("usp.pkl", "rb") as f:
+                usp = pickle.load(f)
+        else:
+            usp = USP()
+            s = Scraper(usp, nroUnidades)
+            s.acessarSite()
+            s.navegarJupiter()
+           
+            with open("usp.pkl", "wb") as f:
+                pickle.dump(usp, f, byref=False, recurse=True)
+
 
         print("\n***-------------------- Carregamento completo ---------------------***")
         menu = Main.menuFuncionalidades()
