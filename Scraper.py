@@ -88,7 +88,7 @@ class Scraper:
             abaGrade.click()
 
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
-            self.getCurso()
+            self.acessarCurso()
 
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             abaMenus = self.driver.find_element("id", value="step1-tab")
@@ -109,7 +109,7 @@ class Scraper:
             except NoSuchElementException:
                 print("Fatal")
     
-    def getCurso(self):
+    def acessarCurso(self):
         html = self.driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
         divInformacoes = soup.find('div', id='step4') 
@@ -129,57 +129,15 @@ class Scraper:
         divGrade = soup.find('div', id="gradeCurricular")
 
 
-        # if self.cursoAtual.nome == "Engenharia Florestal - integral":
-        #     print(divInformacoes.prettify())
-        # #     print(divGrade.prettify())
+        if self.cursoAtual.nome == "Engenharia Florestal - integral":
+            print(divInformacoes.prettify())
+            print(divGrade.prettify())
 
         for tableGrade in divGrade.find_all('table'):
-            tipoDisciplinas = "Obrigatória"
+            tipoDisciplina = "Obrigatória"
             for tr in tableGrade.find_all('tr'):
-                # processarDisciplina(tr)?
-                style = tr.get('style')
-
-                # Verifica qual tipo de disciplina é
-                if style is not None and style.strip() == "background-color: rgb(16, 148, 171); color: white;":
-                    if "Livres" in tr.td.contents[0]:
-                        tipoDisciplinas = "Livre"
-                    elif "Eletivas" in tr.td.contents[0]:
-                        tipoDisciplinas = "Eletiva"
-                    continue
-
-                if style is not None and style.strip() == 'height: 20px;':
-                    tds = tr.find_all('td')
-
-                    linkDisciplina = tds[0].find('a')
-                    disciplinaCodigo = linkDisciplina.contents[0] if tds[0].contents else None
-
-                    # Verifica se a disciplina já está na lista de disciplinas em usp 
-                    disciplina = self.usp.buscarDisciplina(disciplinaCodigo)
-
-                    if disciplina is None:
-                        disciplinaNome = tds[1].contents[0] if tds[1].contents else None
-                        credAula = tds[2].contents[0] if tds[2].contents else None
-                        credTrab = tds[3].contents[0] if tds[3].contents else None
-                        CH = tds[4].contents[0] if tds[4].contents else None
-                        CE = tds[5].contents[0] if tds[5].contents else None
-                        CP = tds[6].contents[0] if tds[6].contents else None
-                        ATPA = tds[7].contents[0] if tds[7].contents else None
-
-                        disciplina = Disciplina(
-                            disciplinaCodigo, 
-                            disciplinaNome,
-                            credAula,
-                            credTrab,
-                            CH, CE, CP, ATPA)
-                    
-                    # Quais cursos tem essa disciplina
-                    if tipoDisciplinas == "Obrigatória":
-                        disciplina.incluirCurso(self.cursoAtual)
-                    # Adiciona a disciplina na lista de disciplinas da usp
-                    self.usp.adicionarDisciplina(disciplina)
-                    # O curso atual recebe a disciplina
-                    self.cursoAtual.adicionarDisciplina(disciplina, tipoDisciplinas)
-
+                tipoDisciplina = self.processarDisciplina(tr, tipoDisciplina)
+                
         self.unidadeAtual.adicionarCurso(self.cursoAtual)   
 
         if len(self.cursoAtual.obrigatorias) == 0:
@@ -189,7 +147,53 @@ class Scraper:
         if len(self.cursoAtual.livres) == 0:
             print("\t\tCurso sem livres")
 
-        # if self.cursoAtual.nome == "Engenharia Florestal - integral":
-        #     print(self.cursoAtual)
+        if self.cursoAtual.nome == "Engenharia Florestal - integral":
+            print(self.cursoAtual)
 
                 # print(self.cursoAtual)
+
+    def processarDisciplina(self, tr, tipoDisciplina):
+        style = tr.get('style')
+
+        # Verifica qual tipo de disciplina é
+        if style is not None and style.strip() == "background-color: rgb(16, 148, 171); color: white;":
+            if "Livres" in tr.td.contents[0]:
+                return "Livre"
+            elif "Eletivas" in tr.td.contents[0]:
+                return "Eletiva"
+
+        if style is not None and style.strip() == 'height: 20px;':
+            tds = tr.find_all('td')
+
+            linkDisciplina = tds[0].find('a')
+            disciplinaCodigo = linkDisciplina.contents[0] if tds[0].contents else None
+
+            # Verifica se a disciplina já está na lista de disciplinas em usp 
+            disciplina = self.usp.buscarDisciplina(disciplinaCodigo)
+
+            if disciplina is None:
+                disciplinaNome = tds[1].contents[0] if tds[1].contents else None
+                credAula = tds[2].contents[0] if tds[2].contents else None
+                credTrab = tds[3].contents[0] if tds[3].contents else None
+                CH = tds[4].contents[0] if tds[4].contents else None
+                CE = tds[5].contents[0] if tds[5].contents else None
+                CP = tds[6].contents[0] if tds[6].contents else None
+                ATPA = tds[7].contents[0] if tds[7].contents else None
+
+                disciplina = Disciplina(
+                    disciplinaCodigo, 
+                    disciplinaNome,
+                    credAula,
+                    credTrab,
+                    CH, CE, CP, ATPA)
+            
+            # Quais cursos tem essa disciplina
+            if tipoDisciplina == "Obrigatória":
+                disciplina.incluirCurso(self.cursoAtual)
+            # Adiciona a disciplina na lista de disciplinas da usp
+            self.usp.adicionarDisciplina(disciplina)
+            # O curso atual recebe a disciplina
+            self.cursoAtual.adicionarDisciplina(disciplina, tipoDisciplina)
+
+        return tipoDisciplina
+
