@@ -173,7 +173,8 @@ class Scraper:
                             CH, CE, CP, ATPA)
                     
                     # Quais cursos tem essa disciplina
-                    disciplina.incluirCurso(self.cursoAtual)
+                    if tipoDisciplinas == "Obrigatória":
+                        disciplina.incluirCurso(self.cursoAtual)
                     # Adiciona a disciplina na lista de disciplinas da usp
                     self.usp.adicionarDisciplina(disciplina)
                     # O curso atual recebe a disciplina
