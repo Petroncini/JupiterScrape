@@ -12,7 +12,10 @@ class USP:
 
         if nome not in self._codigosPorNome:
             self._codigosPorNome[nome] = []
-        self._codigosPorNome[nome].append(codigo)
+
+        # Verifica se o codigo já está no dicionário
+        if codigo not in self._codigosPorNome[nome]:
+            self._codigosPorNome[nome].append(codigo)
         
 
     def adicionarUnidade(self, unidade):
@@ -60,6 +63,7 @@ class USP:
                 print("**********")
             else:
                 print("Disciplina não encontrada")
+        # Busca por nome
         elif nome:
             disciplinas = self._buscarDisciplinaNome(nome)
             if disciplinas:
