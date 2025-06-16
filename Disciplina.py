@@ -8,11 +8,13 @@ class Disciplina:
         self.CE = CE
         self.CP = CP
         self.ATPA = ATPA
-        self.cursosComuns = []
+        # set pra não repetir o mesmo curso em perídos diferentes (integarl, matutino, etc)
+        self.cursosComuns = set()
 
 
     def incluirCurso(self, curso):
-        self.cursosComuns.append((curso.unidade, curso.nome))
+        nomeCurso = self.nomeSemPeriodo(curso.nome)
+        self.cursosComuns.add((curso.unidade, nomeCurso))
 
 
     def __str__(self):
@@ -27,14 +29,19 @@ class Disciplina:
             s += f"\tCarga Horária de Práticas como Componentes Curriculares: {self.CP} h\n"
         if self.ATPA:
             s += f"\tAtividades Teórico-Práticas de Aprofundamento: {self.ATPA}\n"
-        s += "\n"
+        #s += "\n"
 
         return s
     
     def cursosAssociados(self):
-        self.cursosComuns.sort()
+        if not self.cursosComuns:
+            return "Disciplina não é obrigatória em nenhum curso\n"
+        #self.cursosComuns.sort()
         s = "Cursos associados:\n"
         for (unidade, curso) in self.cursosComuns:
             s += f"\t{curso} - {unidade}\n\n"
         
         return s
+
+    def nomeSemPeriodo(self, nomeCurso):
+        return nomeCurso.split(" - ")[0].strip()
