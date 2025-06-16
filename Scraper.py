@@ -24,7 +24,7 @@ class Scraper:
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
         )
         options.add_argument(f"user-agent={user_agent}")
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
@@ -85,16 +85,13 @@ class Scraper:
 
     def carregarGradeCurricular(self):
         try:
+            time.sleep(0.1)
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             self.wait.until(EC.element_to_be_clickable(("id", "step4-tab")))
             abaGrade = self.driver.find_element("id", "step4-tab")
             abaGrade.click()
 
-            self.wait.until(
-            lambda d: d.find_element(By.CSS_SELECTOR, "#step4 .curso").text != 
-            (self.cursoAtual.nome if self.cursoAtual else "")
-            )
-
+            
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             self.getCurso()
 
@@ -137,9 +134,10 @@ class Scraper:
         divGrade = soup.find('div', id="gradeCurricular")
 
 
-        # if self.cursoAtual.nome == "Engenharia Florestal - integral":
-        #     print(divInformacoes.prettify())
-        # #     print(divGrade.prettify())
+        if "Engenharia Florestal - integral" in self.cursoAtual.nome:
+            print(divInformacoes.prettify())
+            time.sleep(300)
+        #     print(divGrade.prettify())
 
         for tableGrade in divGrade.find_all('table'):
             tipoDisciplinas = "Obrigatória"
