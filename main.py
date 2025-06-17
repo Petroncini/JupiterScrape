@@ -81,7 +81,6 @@ class Main:
                 # Disciplinas que são usadas em mais de um curso
                 case '5':
                     usp.listarDisciplinasCompartilhadas()
-                # Imprime o menu de funcionalidades
                 case 'm':
                     print(menu)
                 # Encerra o programa
