@@ -13,7 +13,6 @@ class Disciplina:
 
 
     def incluirCurso(self, cursoNome: str, unidadeNome: str):
-        # nomeCurso = self.nomeSemPeriodo(curso.nome)
         self.cursosComuns.add((str(unidadeNome), str(cursoNome)))
 
 
@@ -33,6 +32,7 @@ class Disciplina:
 
         return s
     
+    # retorna string dos curso associados a disciplina
     def cursosAssociados(self):
         if not self.cursosComuns:
             return "Disciplina não é obrigatória em nenhum curso\n"

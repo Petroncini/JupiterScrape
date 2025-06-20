@@ -28,17 +28,21 @@ class Main:
    
        
     def main():
+        # input do usuário de número de unidades a serem buscadas
         nroUnidades = int(sys.argv[1]) if len(sys.argv) > 1 else None
-        print("\n***------------- Aguarde o carregamento das unidades -------------***\n")
 
         carregarUsp = None
+        # se já existe um pkl com os dados, pergunta se o usuário que uasr esse dados ou realizar o scrape denovo
         if os.path.os.path.isfile("usp.pkl"):
             carregarUsp = input("Deseja carregar os dados salvos? (y/n) ").strip().lower()
 
+        # se o usuário quer carregar os dados, usa o pickle para carregar o .pkl
         if carregarUsp is not None and carregarUsp in {"y", "yes"}:
             with open("usp.pkl", "rb") as f:
                 usp = pickle.load(f)
+        # senão, cria uma instância de USP e faz o scraping
         else:
+            print("\n***------------- Aguarde o carregamento das unidades -------------***\n")
             usp = USP()
             s = Scraper(usp, nroUnidades)
             s.acessarSite()
@@ -52,6 +56,7 @@ class Main:
         menu = Main.menuFuncionalidades()
         print(menu)
 
+        # Realiza funcionalidades
         while True:
             comando = input("\nDigite um comando ou 'm' para ver as opções: ")
         
