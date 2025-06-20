@@ -169,17 +169,6 @@ class Scraper:
                 
         self.unidadeAtual.adicionarCurso(self.cursoAtual)   
 
-        # if len(self.cursoAtual.obrigatorias) == 0:
-        #     print("\t\tCurso sem obrigatórias")
-        # if len(self.cursoAtual.eletivas) == 0:
-        #     print("\t\tCurso sem eletivas")
-        # if len(self.cursoAtual.livres) == 0:
-        #     print("\t\tCurso sem livres")
-
-        # if self.cursoAtual.nome == "Engenharia Florestal - integral":
-        #     print(self.cursoAtual)
-
-                # print(self.cursoAtual)
 
     def processarDisciplina(self, tr, tipoDisciplina):
         style = tr.get('style')
