@@ -1,10 +1,13 @@
+from Disciplina import Disciplina
+from unidecode import unidecode
+
 class USP:
     def __init__(self):
         self.unidades = []
         self._disciplinasPorCod = {}
         self._codigosPorNome = {}
 
-    def adicionarDisciplina(self, disciplina):
+    def adicionarDisciplina(self, disciplina: Disciplina):
         codigo = disciplina.cod
         nome = disciplina.nome
 
@@ -34,8 +37,10 @@ class USP:
 
     # Imprime os dados de um curso ou de todos
     def mostrarCursos(self, nomeCurso=None):
+        cursoEncontrado = False
         # Imprime os dados de todos os cursos
         if nomeCurso is None:
+            cursoEncontrado = True
             for unidade in self.unidades:
                 for curso in unidade.cursos:
                     print()
@@ -45,11 +50,12 @@ class USP:
             for unidade in self.unidades:
                 cursos = [c for c in unidade.cursos if nomeCurso in c.nome]
                 if cursos:
+                    cursoEncontrado = True
                     print(f"Foram encontrados {len(cursos)} cursos:\n" if len(cursos) > 1 else "")
                     for curso in cursos:
                         print(curso)
-                else:
-                    print("Curso não encontrado")
+        if not cursoEncontrado:
+            print("Curso não encontrado")
                 
 
     # Imprime os resultados da busca por uma disciplina via nome ou código
@@ -75,17 +81,17 @@ class USP:
                 print("Disciplina não encontrada")
         
 
-    def buscarDisciplina(self, codigo):
+    def buscarDisciplina(self, codigo) -> Disciplina:
         return self._disciplinasPorCod.get(codigo)
     
 
-    def _buscarDisciplinaNome(self, nomeDisc):
+    def _buscarDisciplinaNome(self, nomeDisc) -> Disciplina:
         codigos = self._codigosPorNome.get(nomeDisc)
         if codigos:
             return [self._disciplinasPorCod[cod] for cod in codigos]
         else:
             # Lista de nomes com a substring nomeDisc
-            nomesCompativeis = [nome for nome in self._codigosPorNome if nomeDisc in nome]
+            nomesCompativeis = [nome for nome in self._codigosPorNome if unidecode(nomeDisc.lower()) in unidecode(nome.lower())]
             if nomesCompativeis:
                 # Pra cada nome, pega a lista de códigos
                 listasCodigos = [self._codigosPorNome[n] for n in nomesCompativeis]
@@ -102,5 +108,8 @@ class USP:
                 print(f"{disciplina.cod} - {disciplina.nome}")
                 print(disciplina.cursosAssociados())
                 #print("**********")
-            
+
+    def listarCursosComDisciplina(self, disciplinaNome: str):
+        for disciplina in self._buscarDisciplinaNome(disciplinaNome):
+            print(disciplina.cursosAssociados())
 

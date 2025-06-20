@@ -1,7 +1,7 @@
 from Curso import Curso
 
 class Unidade:
-    def __init__(self, nome):
+    def __init__(self, nome: str):
         self.nome = nome
         self.cursos = []
 
