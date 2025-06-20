@@ -6,8 +6,14 @@ class Unidade:
         self.cursos = []
 
     def listarCursos(self):
-        for curso in self.cursos:
-            print(curso.nome)
+        if self.cursos:
+            cursos = [self.nome]
+            for curso in self.cursos:
+                # print(curso.nome)
+                cursos.append(curso.nome)
+            cursos.append("")
+            return cursos
+
             
     def adicionarCurso(self, curso: Curso):
         self.cursos.append(curso)
