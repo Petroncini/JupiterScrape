@@ -4,6 +4,8 @@ from Unidade import Unidade
 from Curso import Curso 
 from Disciplina import Disciplina
 import sys
+import tkinter as tk
+from tkinter import ttk
 
 class Main:
 
@@ -33,6 +35,7 @@ class Main:
         print("\n***-------------------- Carregamento completo ---------------------***")
         menu = Main.menuFuncionalidades()
         print(menu)
+        gui = tk.Tk()
 
         while True:
             comando = input("\nDigite um comando ou 'm' para ver as opções: ")

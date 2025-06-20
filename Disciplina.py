@@ -4,10 +4,10 @@ class Disciplina:
         self.nome = nome
         self.aula = aula
         self.trabalho = trabalho
-        self.CH = CH
-        self.CE = CE
-        self.CP = CP
-        self.ATPA = ATPA
+        self.CH = int(CH)
+        self.CE = int(CE)
+        self.CP = int(CP)
+        self.ATPA = int(ATPA)
         # set pra não repetir o mesmo curso em perídos diferentes (integarl, matutino, etc)
         self.cursosComuns = set()
 
