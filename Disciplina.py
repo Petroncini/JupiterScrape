@@ -1,20 +1,20 @@
 class Disciplina:
-    def __init__(self, cod, nome, aula, trabalho, CH, CE, CP, ATPA):
-        self.cod = cod
-        self.nome = nome
-        self.aula = aula
-        self.trabalho = trabalho
-        self.CH = int(CH)
-        self.CE = int(CE)
-        self.CP = int(CP)
-        self.ATPA = int(ATPA)
+    def __init__(self, cod: str, nome: str, aula: int, trabalho: int, CH: int, CE: int, CP: int, ATPA: int):
+        self.cod = str(cod) 
+        self.nome = str(nome)
+        self.aula = int(aula) 
+        self.trabalho = int(trabalho)
+        self.CH = int(CH) if CH is not None else None
+        self.CE = int(CE)  if CE is not None else None
+        self.CP = int(CP) if CP is not None else None
+        self.ATPA = int(ATPA) if ATPA is not None else None
         # set pra não repetir o mesmo curso em perídos diferentes (integarl, matutino, etc)
         self.cursosComuns = set()
 
 
-    def incluirCurso(self, curso):
-        nomeCurso = self.nomeSemPeriodo(curso.nome)
-        self.cursosComuns.add((curso.unidade, nomeCurso))
+    def incluirCurso(self, cursoNome: str, unidadeNome: str):
+        # nomeCurso = self.nomeSemPeriodo(curso.nome)
+        self.cursosComuns.add((str(unidadeNome), str(cursoNome)))
 
 
     def __str__(self):
@@ -24,7 +24,7 @@ class Disciplina:
         s += f"\tCréditos Trabalho: {self.trabalho}\n"
         s += f"\tCarga Horária Total: {self.CH} h\n"
         if self.CE:
-            s += f"\tCarga Horária de Estágio: {self.CH} h\n"
+            s += f"\tCarga Horária de Estágio: {self.CE} h\n"
         if self.CP:
             s += f"\tCarga Horária de Práticas como Componentes Curriculares: {self.CP} h\n"
         if self.ATPA:

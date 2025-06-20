@@ -2,12 +2,12 @@ from Disciplina import Disciplina
 
 
 class Curso:
-    def __init__(self, nome, unidade, ideal, minimo, maximo):
-        self.nome = nome
-        self.unidade = unidade
-        self.ideal = ideal
-        self.min = minimo
-        self.max = maximo
+    def __init__(self, nome: str, unidade: str, ideal: int, minimo: int, maximo: int):
+        self.nome = str(nome)
+        self.unidade = str(unidade)
+        self.ideal = int(ideal)
+        self.min = int(minimo)
+        self.max = int(maximo)
         self.obrigatorias = []
         self.livres = []
         self.eletivas = []
