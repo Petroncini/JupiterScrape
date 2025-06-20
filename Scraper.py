@@ -169,15 +169,15 @@ class Scraper:
                 
         self.unidadeAtual.adicionarCurso(self.cursoAtual)   
 
-        if len(self.cursoAtual.obrigatorias) == 0:
-            print("\t\tCurso sem obrigatórias")
-        if len(self.cursoAtual.eletivas) == 0:
-            print("\t\tCurso sem eletivas")
-        if len(self.cursoAtual.livres) == 0:
-            print("\t\tCurso sem livres")
+        # if len(self.cursoAtual.obrigatorias) == 0:
+        #     print("\t\tCurso sem obrigatórias")
+        # if len(self.cursoAtual.eletivas) == 0:
+        #     print("\t\tCurso sem eletivas")
+        # if len(self.cursoAtual.livres) == 0:
+        #     print("\t\tCurso sem livres")
 
-        if self.cursoAtual.nome == "Engenharia Florestal - integral":
-            print(self.cursoAtual)
+        # if self.cursoAtual.nome == "Engenharia Florestal - integral":
+        #     print(self.cursoAtual)
 
                 # print(self.cursoAtual)
 
@@ -218,7 +218,7 @@ class Scraper:
             
             # Quais cursos tem essa disciplina
             if tipoDisciplina == "Obrigatória":
-                disciplina.incluirCurso(self.cursoAtual)
+                disciplina.incluirCurso(self.cursoAtual.nome, self.unidadeAtual.nome)
             # Adiciona a disciplina na lista de disciplinas da usp
             self.usp.adicionarDisciplina(disciplina)
             # O curso atual recebe a disciplina

@@ -1,16 +1,16 @@
 from Scraper import Scraper 
 from USP import USP
-from Unidade import Unidade
-from Curso import Curso 
-from Disciplina import Disciplina
+from Formatador import Formatador
+from Tabela import Tabela
 import sys
+import tkinter as tk
+from tkinter import ttk
 import os.path
 import dill as pickle
 
 class Main:
 
-    #@staticmethod
-    def menuFuncionalidades():
+    def menuFuncionalidades(self):
         s = "\nMENU DE COMANDOS:\n\n"
         s += "\t1 : Listar os cursos de uma unidade\n"
         s += "\t2 : Mostrar os dados de um curso\n"
@@ -21,13 +21,9 @@ class Main:
         s += "\tq : Encerrar o programa\n"
 
         return s
-    
-    #@staticmethod
 
-
-   
        
-    def main():
+    def main(self):
         # input do usuário de número de unidades a serem buscadas
         nroUnidades = int(sys.argv[1]) if len(sys.argv) > 1 else None
 
@@ -53,8 +49,9 @@ class Main:
 
 
         print("\n***-------------------- Carregamento completo ---------------------***")
-        menu = Main.menuFuncionalidades()
+        menu = self.menuFuncionalidades()
         print(menu)
+        self.form = Formatador()
 
         # Realiza funcionalidades
         while True:
@@ -64,39 +61,55 @@ class Main:
                 # Lista de cursos por unidades
                 case '1':
                     unidade = input("Insira o nome da unidade: ")
-                    usp.listarCursosPorUnidade(unidade)
+                    listaCursos = usp.listarCursosPorUnidade(unidade)
+                    self.mostrarTabela(listaCursos, colunas=["Lista de cursos oferecidos"], titulo="Resultado de 'Listar cursos por unidade'")
+
                 # Dados de um determinado curso
                 case '2':
                     curso = input("Insira o nome do curso: ")
                     print()
-                    usp.mostrarCursos(curso)
+                    dadosCurso = usp.mostrarCursos(curso)
+                    self.mostrarTabela(dadosCurso, colunas=["Dados dos cursos encontrados"], titulo="Resultado de 'Mostrar os dados de um curso'")
+                    
                 # Dados de todos os cursos 
                 case '3':
-                    usp.mostrarCursos()
+                    dadosCursos = usp.mostrarCursos()
+                    self.mostrarTabela(dadosCursos, colunas=["Dados de todos os cursos"], titulo="Resultado de 'Mostrar os dados de todos os cursos'")
+
                 # Dados de uma disciplina
                 case '4':
                     disciplina = input("Insira o nome ou código da disciplina: ")
                     print()
-                    # Se for código
-                    if any(char.isdigit() for char in disciplina):
-                        usp.mostrarDisciplina(None, disciplina)
-                    # Se for nome
-                    else:
-                        usp.mostrarDisciplina(disciplina)
+                    dadosDisciplina = usp.mostrarDisciplina(disciplina)
+                    self.mostrarTabela(dadosDisciplina, colunas=["Dados das disciplinas encontradas"], titulo="Resultado de 'Mostrar os dados de uma disciplina'")
+                
                 # Disciplinas que são usadas em mais de um curso
                 case '5':
-                    usp.listarDisciplinasCompartilhadas()
+                    listaDisc = usp.listarDisciplinasCompartilhadas()
+                    self.mostrarTabela(listaDisc, colunas=["Disciplina", "Cursos que oferecem esta disciplina"], titulo="Resultado de 'Listar as disciplinas incluídas em mais de um curso'")
+
+                # Mostrar o menu de comandos
                 case 'm':
                     print(menu)
+
                 # Encerra o programa
                 case 'q':
                     print("Encerrando o programa...")
                     return
-                #
+                
+                # Mensagem para comando inválido
                 case _:
                     print("\nComando inválido, tente novamente ou digite 'm' para ver as opções.\n")
 
 
+    def mostrarTabela(self, dados, colunas, titulo):
+        if dados:
+            dadosFormatados = self.form.estruturar(dados)
+            janela = tk.Tk()
+            tabela = Tabela(janela, dadosFormatados, colunas, titulo)
+            janela.mainloop()
+
+
 if __name__ == "__main__":
-    Main.main()
+    Main().main()
                                                                                                                                               

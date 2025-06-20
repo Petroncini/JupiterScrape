@@ -4,16 +4,17 @@ class Disciplina:
         self.nome = str(nome)
         self.aula = int(aula) 
         self.trabalho = int(trabalho)
-        self.CH = int(CH) if CH is not None else None
-        self.CE = int(CE)  if CE is not None else None
-        self.CP = int(CP) if CP is not None else None
-        self.ATPA = int(ATPA) if ATPA is not None else None
+        self.CH = int(CH) if CH is not None else 0
+        self.CE = int(CE)  if CE is not None else 0
+        self.CP = int(CP) if CP is not None else 0
+        self.ATPA = int(ATPA) if ATPA is not None else 0
         # set pra não repetir o mesmo curso em perídos diferentes (integarl, matutino, etc)
         self.cursosComuns = set()
 
 
     def incluirCurso(self, cursoNome: str, unidadeNome: str):
-        self.cursosComuns.add((str(unidadeNome), str(cursoNome)))
+        curso = self.nomeSemPeriodo(str(cursoNome))
+        self.cursosComuns.add((str(unidadeNome), curso))
 
 
     def __str__(self):
@@ -34,14 +35,17 @@ class Disciplina:
     
     # retorna string dos curso associados a disciplina
     def cursosAssociados(self):
-        if not self.cursosComuns:
-            return "Disciplina não é obrigatória em nenhum curso\n"
-        #self.cursosComuns.sort()
-        s = "Cursos associados:\n"
+        # if not self.cursosComuns:
+        #     return "Disciplina não é obrigatória em nenhum curso\n"
+        # #self.cursosComuns.sort()
+        # s = "Cursos associados:\n"
+        # for (unidade, curso) in self.cursosComuns:
+        #     s += f"\t{curso} - {unidade}\n\n"
+        listaNomes = []
         for (unidade, curso) in self.cursosComuns:
-            s += f"\t{curso} - {unidade}\n\n"
+            listaNomes.append(f"{curso} - {unidade}")
         
-        return s
+        return listaNomes
 
     def nomeSemPeriodo(self, nomeCurso):
         return nomeCurso.split(" - ")[0].strip()

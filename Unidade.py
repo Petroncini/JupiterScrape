@@ -9,8 +9,14 @@ class Unidade:
 
     # lista cursos da unidade
     def listarCursos(self):
-        for curso in self.cursos:
-            print(curso.nome)
+        if self.cursos:
+            cursos = [self.nome]
+            for curso in self.cursos:
+                # print(curso.nome)
+                cursos.append(curso.nome)
+            cursos.append("")
+            return cursos
+
             
     # adiciona curso
     def adicionarCurso(self, curso: Curso):

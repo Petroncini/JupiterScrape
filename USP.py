@@ -1,4 +1,5 @@
 from Disciplina import Disciplina
+from Unidade import Unidade
 from unidecode import unidecode
 
 # classe que contém todas as informações raspadas do Jupiter
@@ -34,24 +35,31 @@ class USP:
 
     # Imprime o nome dos cursos da unidade especificada
     def listarCursosPorUnidade(self, nomeUnidade):
-        unidade = next((u for u in self.unidades if unidecode(nomeUnidade.lower()) in unidecode(u.nome.lower())), None)
-        if unidade is not None:
-            print(f"\nCursos oferecidos por {unidade.nome}:\n")
-            unidade.listarCursos()
+        unidades = [u for u in self.unidades if unidecode(nomeUnidade.lower()) in unidecode(u.nome.lower())]
+        if unidades:
+            nomes = ", ".join(u.nome for u in unidades)
+            print(f"\nCursos oferecidos por {nomes}:\n")
+            listaCursos = []
+            for u in unidades:
+                listaCursos += u.listarCursos()
+            return listaCursos
         else:
-            print("Unidade não encontrada")
+            print("\nUnidade não encontrada")
 
 
     # Imprime os dados de um curso ou de todos
     def mostrarCursos(self, nomeCurso=None):
         cursoEncontrado = False
+        listaCursos = []
         # Imprime os dados de todos os cursos
         if nomeCurso is None:
             cursoEncontrado = True
             for unidade in self.unidades:
                 for curso in unidade.cursos:
-                    print()
-                    print(curso)
+                    listaCursos.append(curso)
+                    # print()
+                    # print(curso)
+
         # Imprime os dados dos cursos que contêm a substring nomeCurso       
         else:
             for unidade in self.unidades:
@@ -59,32 +67,41 @@ class USP:
                 cursos = [c for c in unidade.cursos if unidecode(nomeCurso.lower()) in unidecode(c.nome.lower())]
                 if cursos:
                     cursoEncontrado = True
-                    print(f"Foram encontrados {len(cursos)} cursos:\n" if len(cursos) > 1 else "")
                     for curso in cursos:
-                        print(curso)
-        if not cursoEncontrado:
+                        # print(curso)
+                        listaCursos.append(curso)
+
+        if cursoEncontrado:
+            print(f"Foram encontrados {len(listaCursos)} cursos:\n" if len(listaCursos) > 1 else "")
+            return listaCursos
+        else:
             print("Curso não encontrado")
                 
 
     # Imprime os resultados da busca por uma disciplina via nome ou código
-    def mostrarDisciplina(self, nome=None, codigo=None):
-        print()
-        if codigo:
-            disciplina = self.buscarDisciplina(codigo)
-            if disciplina:
-                print(disciplina)
-                print(disciplina.cursosAssociados())
-                print("**********")
+    def mostrarDisciplina(self, disciplina):
+        # Se for código
+        if any(char.isdigit() for char in disciplina):
+            codigo = disciplina
+            d = self.buscarDisciplina(codigo)
+            if d:
+                # print(disciplina)
+                # print(disciplina.cursosAssociados())
+                # print("**********")
+                return [(d, d.cursosAssociados())]
             else:
                 print("Disciplina não encontrada")
         # Busca por nome
-        elif nome:
-            disciplinas = self._buscarDisciplinaNome(nome)
+        else:
+            disciplinas = self._buscarDisciplinaNome(disciplina)
             if disciplinas:
+                listaDisc = []
                 for d in disciplinas:
-                    print(d)
-                    print(d.cursosAssociados())
-                    print("**********")
+                    # print(d)
+                    # print(d.cursosAssociados())
+                    # print("**********")
+                    listaDisc.append((d, d.cursosAssociados()))
+                return listaDisc
             else:
                 print("Disciplina não encontrada")
         
@@ -113,13 +130,17 @@ class USP:
         return None
 
     def listarDisciplinasCompartilhadas(self):
+        listaDiscCursos = []
         for disciplina in self._disciplinasPorCod.values():
             if disciplina.cursosComuns and len(disciplina.cursosComuns) > 1:
-                print(f"{disciplina.cod} - {disciplina.nome}")
-                print(disciplina.cursosAssociados())
+                listaDiscCursos.append((f"{disciplina.cod} - {disciplina.nome}", disciplina.cursosAssociados()))
+                # print(f"{disciplina.cod} - {disciplina.nome}")
+                # print(disciplina.cursosAssociados())
                 #print("**********")
+        return listaDiscCursos
 
     def listarCursosComDisciplina(self, disciplinaNome: str):
+        listaCursos = []
         for disciplina in self._buscarDisciplinaNome(disciplinaNome):
             print(disciplina.cursosAssociados())
 
