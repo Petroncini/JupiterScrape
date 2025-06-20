@@ -1,18 +1,24 @@
 from Disciplina import Disciplina
 from unidecode import unidecode
 
+# classe que contém todas as informações raspadas do Jupiter
 class USP:
     def __init__(self):
-        self.unidades = []
-        self._disciplinasPorCod = {}
-        self._codigosPorNome = {}
+        self.unidades = [] # unidades da usp
+        self._disciplinasPorCod = {} # dicionário das disciplinas indexadas por código
+        self._codigosPorNome = {} # dicionário de códigos indexados por nome, para busca
 
+    # adiciona disciplina na usp, a USP guarda disciplinas diretamente para operações de busca de disciplinas
     def adicionarDisciplina(self, disciplina: Disciplina):
         codigo = disciplina.cod
         nome = disciplina.nome
 
+        # adiciona disciplina
+        # Se não existe, é criada
+        # Se existe, adiciona a disicplina que foi atualizada no scraper
         self._disciplinasPorCod[codigo] = disciplina
 
+        # verifica se nome já existe
         if nome not in self._codigosPorNome:
             self._codigosPorNome[nome] = []
 
@@ -21,13 +27,14 @@ class USP:
             self._codigosPorNome[nome].append(codigo)
         
 
+    # adiciona unidade
     def adicionarUnidade(self, unidade):
         self.unidades.append(unidade)
 
 
     # Imprime o nome dos cursos da unidade especificada
     def listarCursosPorUnidade(self, nomeUnidade):
-        unidade = next((u for u in self.unidades if nomeUnidade in u.nome), None)
+        unidade = next((u for u in self.unidades if unidecode(nomeUnidade.lower()) in unidecode(u.nome.lower())), None)
         if unidade is not None:
             print(f"\nCursos oferecidos por {unidade.nome}:\n")
             unidade.listarCursos()
@@ -48,7 +55,8 @@ class USP:
         # Imprime os dados dos cursos que contêm a substring nomeCurso       
         else:
             for unidade in self.unidades:
-                cursos = [c for c in unidade.cursos if nomeCurso in c.nome]
+                # ignora case e acentos
+                cursos = [c for c in unidade.cursos if unidecode(nomeCurso.lower()) in unidecode(c.nome.lower())]
                 if cursos:
                     cursoEncontrado = True
                     print(f"Foram encontrados {len(cursos)} cursos:\n" if len(cursos) > 1 else "")
@@ -81,16 +89,18 @@ class USP:
                 print("Disciplina não encontrada")
         
 
+    # busca disciplina por código
     def buscarDisciplina(self, codigo) -> Disciplina:
         return self._disciplinasPorCod.get(codigo)
     
 
+    # busca disciplina por nome
     def _buscarDisciplinaNome(self, nomeDisc) -> Disciplina:
         codigos = self._codigosPorNome.get(nomeDisc)
         if codigos:
             return [self._disciplinasPorCod[cod] for cod in codigos]
         else:
-            # Lista de nomes com a substring nomeDisc
+            # Lista de nomes com a substring nomeDisc, ignora caracter e acento
             nomesCompativeis = [nome for nome in self._codigosPorNome if unidecode(nomeDisc.lower()) in unidecode(nome.lower())]
             if nomesCompativeis:
                 # Pra cada nome, pega a lista de códigos

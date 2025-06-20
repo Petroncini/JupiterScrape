@@ -3,14 +3,14 @@ from Disciplina import Disciplina
 
 class Curso:
     def __init__(self, nome: str, unidade: str, ideal: int, minimo: int, maximo: int):
-        self.nome = str(nome)
-        self.unidade = str(unidade)
+        self.nome = str(nome) # Nome: str
+        self.unidade = str(unidade) # unidade: str
         self.ideal = int(ideal)
         self.min = int(minimo)
         self.max = int(maximo)
-        self.obrigatorias = []
-        self.livres = []
-        self.eletivas = []
+        self.obrigatorias = [] # lista de disciplinas obrigatorias
+        self.livres = [] # lista de disciplinas livres
+        self.eletivas = [] # lista de disciplinas livres
 
     def adicionarDisciplina(self, disciplina: Disciplina, tipo):
         if tipo == "Obrigatória":
