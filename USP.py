@@ -2,24 +2,25 @@ from Disciplina import Disciplina
 from Unidade import Unidade
 from unidecode import unidecode
 
-# classe que contém todas as informações raspadas do Jupiter
+# Classe que contém todas as informações coletadas do JupiterWeb e
+# que realiza as consultas
 class USP:
     def __init__(self):
-        self.unidades = [] # unidades da usp
-        self._disciplinasPorCod = {} # dicionário das disciplinas indexadas por código
-        self._codigosPorNome = {} # dicionário de códigos indexados por nome, para busca
+        self.unidades = [] # lista de unidades da usp
+        self._disciplinasPorCod = {} # Dicionário das disciplinas indexadas por código
+        # Dicionário que relaciona um nome de disciplina a uma lista de códigos correspondentes
+        self._codigosPorNome = {}
 
-    # adiciona disciplina na usp, a USP guarda disciplinas diretamente para operações de busca de disciplinas
+    # Adiciona disciplina na usp, a USP guarda disciplinas diretamente para operações de busca
     def adicionarDisciplina(self, disciplina: Disciplina):
         codigo = disciplina.cod
         nome = disciplina.nome
 
-        # adiciona disciplina
-        # Se não existe, é criada
-        # Se existe, adiciona a disicplina que foi atualizada no scraper
+        # Adiciona a disciplina no dicionário
+        # Cria a disciplina ou atualiza com os novos dados do scraper
         self._disciplinasPorCod[codigo] = disciplina
 
-        # verifica se nome já existe
+        # Verifica se o nome já existe no dicionário
         if nome not in self._codigosPorNome:
             self._codigosPorNome[nome] = []
 
@@ -28,47 +29,46 @@ class USP:
             self._codigosPorNome[nome].append(codigo)
         
 
-    # adiciona unidade
+    # Adiciona a  unidade na lista
     def adicionarUnidade(self, unidade):
         self.unidades.append(unidade)
 
 
-    # Imprime o nome dos cursos da unidade especificada
+    # Consulta 1: Lista o nome dos cursos da unidade especificada
     def listarCursosPorUnidade(self, nomeUnidade):
+        # Coleta as unidades compatíveis com a entrada do usuário
         unidades = [u for u in self.unidades if unidecode(nomeUnidade.lower()) in unidecode(u.nome.lower())]
         if unidades:
+            # Imprime os nomes das unidades encontradas
             nomes = ", ".join(u.nome for u in unidades)
             print(f"\nCursos oferecidos por {nomes}:\n")
             listaCursos = []
             for u in unidades:
                 listaCursos += u.listarCursos()
-            return listaCursos
+            return listaCursos  # Retorna a lista de cursos
         else:
             print("\nUnidade não encontrada")
 
 
-    # Imprime os dados de um curso ou de todos
+    # Consultas 2 e 3: Mostra os dados de um curso ou de todos
     def mostrarCursos(self, nomeCurso=None):
         cursoEncontrado = False
         listaCursos = []
-        # Imprime os dados de todos os cursos
+        # Retorna todos os cursos
         if nomeCurso is None:
             cursoEncontrado = True
             for unidade in self.unidades:
                 for curso in unidade.cursos:
                     listaCursos.append(curso)
-                    # print()
-                    # print(curso)
 
-        # Imprime os dados dos cursos que contêm a substring nomeCurso       
+        # Retorna os cursos cujos nomes contêm a substring nomeCurso       
         else:
             for unidade in self.unidades:
-                # ignora case e acentos
+                # Ignora maiúsculas e acentos
                 cursos = [c for c in unidade.cursos if unidecode(nomeCurso.lower()) in unidecode(c.nome.lower())]
                 if cursos:
                     cursoEncontrado = True
                     for curso in cursos:
-                        # print(curso)
                         listaCursos.append(curso)
 
         if cursoEncontrado:
@@ -78,16 +78,13 @@ class USP:
             print("Curso não encontrado")
                 
 
-    # Imprime os resultados da busca por uma disciplina via nome ou código
+    # Consulta 4: Retorna os resultados da busca por uma disciplina via nome ou código
     def mostrarDisciplina(self, disciplina):
         # Se for código
         if any(char.isdigit() for char in disciplina):
             codigo = disciplina
             d = self.buscarDisciplina(codigo)
-            if d:
-                # print(disciplina)
-                # print(disciplina.cursosAssociados())
-                # print("**********")
+            if d: # Retorna uma lista com o par (Disciplina, lista de nomes de cursos)
                 return [(d, d.cursosAssociados())]
             else:
                 print("Disciplina não encontrada")
@@ -96,31 +93,31 @@ class USP:
             disciplinas = self._buscarDisciplinaNome(disciplina)
             if disciplinas:
                 listaDisc = []
+                # Retorna uma lista com as disciplinas compatíveis com o nome e seus cursos
                 for d in disciplinas:
-                    # print(d)
-                    # print(d.cursosAssociados())
-                    # print("**********")
                     listaDisc.append((d, d.cursosAssociados()))
                 return listaDisc
             else:
                 print("Disciplina não encontrada")
         
 
-    # busca disciplina por código
+    # Busca disciplina por código
     def buscarDisciplina(self, codigo) -> Disciplina:
         return self._disciplinasPorCod.get(codigo)
     
 
-    # busca disciplina por nome
+    # Busca disciplina por nome
     def _buscarDisciplinaNome(self, nomeDisc) -> Disciplina:
+        # Acessa a lista de códigos do dicionário
         codigos = self._codigosPorNome.get(nomeDisc)
-        if codigos:
+        if codigos: # Retorna a lista de códigos
             return [self._disciplinasPorCod[cod] for cod in codigos]
-        else:
-            # Lista de nomes com a substring nomeDisc, ignora caracter e acento
+        
+        else: # Se não achou, busca sequencial por substring
+            # Lista de nomes com a substring nomeDisc, ignora maiúscula e acento
             nomesCompativeis = [nome for nome in self._codigosPorNome if unidecode(nomeDisc.lower()) in unidecode(nome.lower())]
             if nomesCompativeis:
-                # Pra cada nome, pega a lista de códigos
+                # Pra cada nome, pega a lista de códigos do dicionário
                 listasCodigos = [self._codigosPorNome[n] for n in nomesCompativeis]
                 codigos = []
                 for lista in listasCodigos:
@@ -129,18 +126,13 @@ class USP:
                 return [self._disciplinasPorCod[cod] for cod in codigos]
         return None
 
+    # Consulta 5: lista as disciplinas presentes em mais de um curso, junto com a
+    # lista de cursos que oferecem a disciplina
     def listarDisciplinasCompartilhadas(self):
         listaDiscCursos = []
+        # Percorre as disciplinas verificando se ela está presente em mais de um curso
         for disciplina in self._disciplinasPorCod.values():
             if disciplina.cursosComuns and len(disciplina.cursosComuns) > 1:
                 listaDiscCursos.append((f"{disciplina.cod} - {disciplina.nome}", disciplina.cursosAssociados()))
-                # print(f"{disciplina.cod} - {disciplina.nome}")
-                # print(disciplina.cursosAssociados())
-                #print("**********")
+                
         return listaDiscCursos
-
-    def listarCursosComDisciplina(self, disciplinaNome: str):
-        listaCursos = []
-        for disciplina in self._buscarDisciplinaNome(disciplinaNome):
-            print(disciplina.cursosAssociados())
-

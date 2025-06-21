@@ -16,9 +16,10 @@ from Unidade import Unidade
 from Curso import Curso 
 from Disciplina import Disciplina
 
+# Classe que realiza o scraping no JupiterWeb por meio do Selenium WebDriver
 class Scraper:
     def __init__(self, usp: USP, nroUnidades=None):
-        # configurações do webdriver
+        # Configurações do webdriver
         options = Options()
         user_agent = (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -30,67 +31,67 @@ class Scraper:
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--window-size=1920,1080")
-        self.usp = usp # objeto usp que receberá informação
-        self.unidadeAtual = None # unidade sendo processda
-        self.cursoAtual = None # curso send processado
-        self.limite = (nroUnidades + 1) if nroUnidades is not None else None # limite de busca
+        self.usp = usp # Objeto usp que receberá informação
+        self.unidadeAtual = None # Unidade sendo processada
+        self.cursoAtual = None # Curso sendo processado
+        self.limite = (nroUnidades + 1) if nroUnidades is not None else None # Limite de unidades na busca
 
-
+        # Inicializa o webDriver
         self.driver = webdriver.Chrome(options=options)
         self.wait = WebDriverWait(self.driver, timeout=30)
     
     def acessarSite(self):
         self.driver.get("https://uspdigital.usp.br/jupiterweb/jupCarreira.jsp?codmnu=8275")
     
-    def navegarJupiter(self): # navega pagina do jupiter para acessar informações
+    def navegarJupiter(self): # Navega a página do jupiter para acessar informações
         self.acessarSite()
         # Espera até encontrar o elemento comboUnidade
         self.wait.until(EC.presence_of_element_located((By.ID, "comboUnidade")))
-        # espera opçÕes carregarem
+        # Espera o carregamento das opções
         self.wait.until(lambda d: len(Select(d.find_element(By.ID, "comboUnidade")).options) > 1)
-        # elemento dropdown de unidades
+        # Elemento dropdown de unidades
         unidadeSelect_element = self.driver.find_element("id", value="comboUnidade") 
-        #botao de busca
+        # Botão de busca
         buscarButton = self.driver.find_element("id", value="enviar")
         
-        # select de unidade
+        # Seleção da unidade
         unidadeSelect = Select(unidadeSelect_element)
-        # timer para avaliar performance
+        # Timer para avaliar performance
         t0 = time.time()
 
         if self.limite is None : self.limite = len(unidadeSelect.options)
 
-        # itera por cada unidade
+        # Itera por cada unidade
         for unidade in unidadeSelect.options[1:self.limite]:
             # Cria unidade e adiciona na USP 
             self.unidadeAtual = Unidade(unidade.text)
             print(self.unidadeAtual.nome)
             self.usp.adicionarUnidade(self.unidadeAtual)
             
-            #seleciona unidade no menu
+            # Seleciona unidade no menu
             unidadeSelect.select_by_visible_text(unidade.text) 
 
-            # espera carregar dropdown e opções de curso da unidade
+            # Espera carregar dropdown e opções de curso da unidade
             self.wait.until(EC.presence_of_element_located((By.ID, "comboCurso")))
             self.wait.until(lambda _: len(Select(self.driver.find_element("id", value="comboCurso")).options) > 1)
 
-            # elemeto de seleção de curso
+            # Elemento de seleção de curso
             cursoSelect_element = self.driver.find_element("id", value="comboCurso")
             cursoSelect = Select(cursoSelect_element)
 
-            # itera por cada curso na unidade
+            # Itera por cada curso na unidade
             for curso in cursoSelect.options[1:]:
-                #seleciona curso no menu
+                # Seleciona o curso no menu
                 cursoSelect.select_by_visible_text(curso.text)
 
-                # a os elementos da classe blockUI aparecem quando a página está carregando algo
-                # esperando o número de elementos blockUI ser 0, esperamos todos os dados serem carregados
+                # Os elementos da classe blockUI aparecem quando a página está carregando algo
+                # Esperando o número de elementos blockUI ser 0, esperamos todos os dados serem carregados
                 self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
                 self.wait.until(EC.element_to_be_clickable(("id", "enviar"))) # confere ser é clicável
-                # clica botão para ir para a aba "informações de curso" do curso selecionado
+                # Clica no botão para ir para a aba "informações de curso" do curso selecionado
                 buscarButton.click()   
 
-                # chama função para de fato carregar as informações do curso 
+                # Chama função para de fato carregar as informações do curso 
                 self.navegarCurso()
 
         self.unidadeAtual = None
@@ -98,37 +99,36 @@ class Scraper:
 
         t1 = time.time()
         total = t1 - t0
-        print(f'Time: {total}')
+        print(f'\nTempo: {total}')
 
-    def navegarCurso(self): # navega página do curso para encontrar informações
+    def navegarCurso(self): # Navega a página do curso para encontrar informações
         try:
-            # espera carregar e aba de Grade Curriscular ser clicável
+            # Espera carregar e aba de Grade Curricular ser clicável
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             self.wait.until(EC.element_to_be_clickable(("id", "step4-tab")))
-            # aba da grade
+            # Aba da grade
             abaGrade = self.driver.find_element("id", "step4-tab")
-            # clica na aba da grade
+            # Clica na aba da grade
             abaGrade.click()
 
-            # depois de chegar na aba da grade, chama função para processar HTML
+            # Depois de chegar na aba da grade, chama função para processar o HTML
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             self.acessarCurso()
 
-            # depois de carregar informações do curso, volta para o menu de unidades e cursos
+            # Depois de carregar informações do curso, volta para o menu de unidades e cursos
             self.wait.until(lambda d: len(d.find_elements(By.CLASS_NAME, "blockUI")) == 0)
             abaMenus = self.driver.find_element("id", value="step1-tab")
             abaMenus.click()
 
             
         except ElementClickInterceptedException:
-            # esse erro ocorre quando o curso selecionado e buscando não tem informações 
-            # aparece então uma janela de erro informando esse fato e
-            # o click na aba de "Informações de Curso" é interceptado
+            # Erro que ocorre quando o curso selecionado e buscado não tem informações 
+            # e aparece uma janela de erro que intercepta o click na aba de "Informações do Curso"
 
             print("             Erro - dados não encontrados")
 
             try:
-                # acha e clica o botão de fechar na janela de erro
+                # Acha e clica no botão de fechar na janela de erro
                 fechar = self.driver.find_element(By.XPATH, '//button[contains(@class, "ui-button") and .//span[text()="Fechar"]]')
                 fechar.click()
 
@@ -137,9 +137,10 @@ class Scraper:
                 abaMenus.click()
 
             except NoSuchElementException:
-                # algo deu muito errado
+                # Algo deu muito errado
                 print("Fatal")
     
+    # Coleta as informações do curso na grade curricular
     def acessarCurso(self):
         html = self.driver.page_source
         soup = BeautifulSoup(html, 'html.parser')
@@ -161,7 +162,7 @@ class Scraper:
 
         divGrade = soup.find('div', id="gradeCurricular") # div com as tabelas das grade
     
-        # itera pelas tabelas de disciplinas obrigatórias, eletivas e livres
+        # Itera pelas tabelas de disciplinas obrigatórias, eletivas e livres
         for tableGrade in divGrade.find_all('table'):
             tipoDisciplina = "Obrigatória"
             for tr in tableGrade.find_all('tr'):
@@ -169,7 +170,7 @@ class Scraper:
                 
         self.unidadeAtual.adicionarCurso(self.cursoAtual)   
 
-
+    # Coleta as informações de uma disciplina
     def processarDisciplina(self, tr, tipoDisciplina):
         style = tr.get('style')
 
@@ -189,6 +190,7 @@ class Scraper:
             # Verifica se a disciplina já está na lista de disciplinas em usp 
             disciplina = self.usp.buscarDisciplina(disciplinaCodigo)
 
+            # Se não está, cria a disciplina
             if disciplina is None:
                 disciplinaNome = tds[1].contents[0] if tds[1].contents else None
                 credAula = tds[2].contents[0] if tds[2].contents else None
@@ -205,7 +207,7 @@ class Scraper:
                     credTrab,
                     CH, CE, CP, ATPA)
             
-            # Quais cursos tem essa disciplina
+            # Inclui o curso atual na lista de cursos que contém essa disciplina
             if tipoDisciplina == "Obrigatória":
                 disciplina.incluirCurso(self.cursoAtual.nome, self.unidadeAtual.nome)
             # Adiciona a disciplina na lista de disciplinas da usp

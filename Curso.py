@@ -1,17 +1,18 @@
 from Disciplina import Disciplina
 
-
+# Classe que representa um curso
 class Curso:
     def __init__(self, nome: str, unidade: str, ideal: int, minimo: int, maximo: int):
-        self.nome = str(nome) # Nome: str
-        self.unidade = str(unidade) # unidade: str
-        self.ideal = int(ideal)
-        self.min = int(minimo)
-        self.max = int(maximo)
-        self.obrigatorias = [] # lista de disciplinas obrigatorias
-        self.livres = [] # lista de disciplinas livres
-        self.eletivas = [] # lista de disciplinas livres
+        self.nome = str(nome) # Nome do curso: str
+        self.unidade = str(unidade) # Nome da unidade: str
+        self.ideal = int(ideal) # Duração ideal
+        self.min = int(minimo) # Duração mínima
+        self.max = int(maximo) # Duração máxima
+        self.obrigatorias = [] # Lista de disciplinas obrigatórias
+        self.livres = [] # Lista de disciplinas optativas livres
+        self.eletivas = [] # Lista de disciplinas optativas eletivas
 
+    # Inclui uma disciplina em uma das listas do curso de acordo com o tipo fornecido
     def adicionarDisciplina(self, disciplina: Disciplina, tipo):
         if tipo == "Obrigatória":
             self.obrigatorias.append(disciplina)
