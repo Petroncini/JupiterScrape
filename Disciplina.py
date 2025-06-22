@@ -9,7 +9,7 @@ class Disciplina:
         self.CE = int(CE)  if CE is not None else 0 # Carga horária de estágio
         self.CP = int(CP) if CP is not None else 0 # Carga horária de Práticas como Componentes Curriculares
         self.ATPA = int(ATPA) if ATPA is not None else 0 # Atividades Teórico-Práticas de Aprofundamento
-        # Set que guarda os cursos que contém essa disciplina, sem considerar o período (matutino, integral, etc)
+        # Set com os nomes dos cursos que têm essa disciplina, sem considerar o período (matutino, integral, etc)
         self.cursosComuns = set()
 
     # Inclui um curso no conjunto de cursos comuns
@@ -41,6 +41,6 @@ class Disciplina:
         
         return listaNomes
 
-    # Remove o período do nome do curso, que é separado por hífen
+    # Remove o período do nome do curso, que é separado pelo último hífen
     def nomeSemPeriodo(self, nomeCurso):
-        return nomeCurso.split(" - ")[0].strip()
+        return nomeCurso.rsplit(" - ", 1)[0].strip()
